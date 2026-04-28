@@ -406,12 +406,31 @@
     .controls-row { gap: 0.5rem; margin-bottom: 1rem; }
     .modal-box { padding: 1.5rem; }
     .modal-box .price { font-size: 1.6rem; }
+    /* Mobile: bare symbol footer */
+    .slot-footer .char-label { display: none; }
+    .slot-footer .badge { display: none; }
+    .slot-footer .reload-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: 1.1rem;
+    }
+    .slot-footer .reload-btn:hover { background: none; border-color: transparent; }
+    .slot-footer .filter-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: 1rem;
+    }
+    .slot-footer .filter-btn:hover { background: none; border-color: transparent; }
   }
   @media (max-width: 360px) {
     .letter-slot img { height: 100px; }
     .letter-slot .location-label { font-size: 0.5rem; }
-    .slot-footer .reload-btn { font-size: 0.85rem; }
-    .slot-footer .filter-btn { font-size: 0.75rem; padding: 0 5px 1px; }
+    .slot-footer .reload-btn { font-size: 0.95rem; padding: 0; }
+    .slot-footer .filter-btn { font-size: 0.85rem; padding: 0; }
   }
 </style>
 </head>
