@@ -756,6 +756,7 @@ function lockIt() {
   }
   params.set('watermarked', 'true');
   params.set('height', '1200');
+  params.set('show_locations', 'true');
 
   // Include current filter state
   const globalFilter = $('filterSelect').value;
@@ -802,6 +803,7 @@ async function shareImage() {
   }
   params.set('format', 'square');
   params.set('watermarked', 'true');
+  params.set('show_locations', 'true');
 
   // Include current filter state in share
   const globalFilter = $('filterSelect').value;
@@ -947,6 +949,7 @@ function regenerateClean() {
   }
   params.set('watermarked', 'false');
   params.set('height', '1200');
+  params.set('show_locations', 'true');
   params.set('session_token', getSessionToken());
 
   const cleanUrl = '/generate?' + params.toString();

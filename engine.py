@@ -110,6 +110,60 @@ def _sepia(img: Image.Image, factor: float = 1.0) -> Image.Image:
     return Image.blend(img, sepia, factor)
 
 
+def load_locations() -> dict:
+    """Load location metadata from locations.json."""
+    loc_path = os.path.join(os.path.dirname(__file__), "locations.json")
+    if not os.path.exists(loc_path):
+        return {}
+    with open(loc_path) as f:
+        return json.load(f)
+
+
+_LOCATIONS_CACHE: dict | None = None
+
+
+def location_for_file(filename: str) -> tuple[str, str] | None:
+    """Get (title, coords) for a letter filename like 'a_0.jpg'."""
+    global _LOCATIONS_CACHE
+    if _LOCATIONS_CACHE is None:
+        _LOCATIONS_CACHE = load_locations()
+    entry = _LOCATIONS_CACHE.get(filename)
+    if entry:
+        return entry.get("title", ""), entry.get("coords", "")
+    return None
+
+
+def overlay_location_label(img: Image.Image, title: str, coords: str) -> Image.Image:
+    """Draw a semi-transparent label bar at the bottom with location info."""
+    bar_height = max(36, img.height // 25)
+    overlay = Image.new("RGBA", (img.width, bar_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    # Dark semi-transparent bar
+    draw.rectangle([(0, 0), (img.width, bar_height)], fill=(0, 0, 0, 160))
+
+    try:
+        title_font = ImageFont.truetype(WATERMARK_FONT, size=max(12, bar_height // 3))
+        coord_font = ImageFont.truetype(WATERMARK_FONT, size=max(10, bar_height // 4))
+    except (IOError, OSError):
+        title_font = ImageFont.load_default()
+        coord_font = title_font
+
+    # Title (place name) — left-aligned with padding
+    padding = 8
+    draw.text((padding, 3), title, font=title_font, fill=(255, 255, 255, 230))
+
+    # Coord string — right-aligned, smaller
+    cb = draw.textbbox((0, 0), coords, font=coord_font)
+    cw = cb[2] - cb[0]
+    draw.text((img.width - cw - padding, 3), coords, font=coord_font, fill=(200, 200, 200, 180))
+
+    # Compose onto the full image
+    img_rgba = img.convert("RGBA")
+    img_rgba.paste(overlay, (0, img.height - bar_height), overlay)
+    return img_rgba.convert("RGB")
+
+
 def apply_watermark(img: Image.Image, text: str = "geoglyph.earth") -> Image.Image:
     """Overlay a semi-transparent watermark in the bottom-right corner."""
     try:
@@ -185,6 +239,7 @@ def generate(
     square: int | None = None,
     filter_name: str | None = None,
     letter_filters: dict[str, str] | None = None,
+    show_locations: bool = False,
 ) -> Image.Image:
     """Stitch letter images for a name into a single image.
 
@@ -196,6 +251,7 @@ def generate(
         square: If set, pad to this size (e.g. 1080) with branding.
         filter_name: Global filter to apply (natural, contrast, infrared, etc.).
         letter_filters: Per-letter filter overrides {letter: filter_name}.
+        show_locations: If True, overlay location place names on each tile.
     """
     name = name.strip().lower()
     if not name:
@@ -216,6 +272,11 @@ def generate(
         lf = letter_filters.get(c, filter_name or "")
         if lf and lf != "natural":
             img = apply_filter(img, lf)
+        # Overlay location label if requested
+        if show_locations:
+            loc = location_for_file(f"{c}_{v}.jpg")
+            if loc:
+                img = overlay_location_label(img, loc[0], loc[1])
         images.append(img)
 
     max_h = max(img.height for img in images)

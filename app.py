@@ -142,6 +142,7 @@ async def generate_image(
     session_token: str | None = Query(None, description="Paid session token (removes watermark)"),
     filter: str | None = Query(None, description="Global CSS filter to apply (natural, contrast, infrared, thermal, grayscale, falsecolor)"),
     letter_filters: str | None = Query(None, description='Per-letter filter overrides JSON, e.g. {"a":"infrared","b":"thermal"}'),
+    show_locations: bool = Query(False, description="Overlay location place names on each letter tile"),
 ):
     """Generate satellite name image. Free tier gets watermarked; paid tier can get clean."""
     cleaned = "".join(c for c in name if c.isalpha() or c == " ")
@@ -171,7 +172,7 @@ async def generate_image(
     # Decide square output
     square_size = 1080 if format == "square" else None
 
-    img = generate(cleaned, variant_dict, height=height, watermarked=should_watermark, square=square_size, filter_name=filter, letter_filters=letter_filter_dict)
+    img = generate(cleaned, variant_dict, height=height, watermarked=should_watermark, square=square_size, filter_name=filter, letter_filters=letter_filter_dict, show_locations=show_locations)
     buf = io.BytesIO()
     img.save(buf, "JPEG", quality=95)
     buf.seek(0)
