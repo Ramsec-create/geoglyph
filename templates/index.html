@@ -794,11 +794,20 @@ async function shareImage() {
 
   const shareUrl = '/generate?' + params.toString();
 
+  // Fetch image first so blob is available throughout
+  let blob;
   try {
     const resp = await fetch(shareUrl);
-    const blob = await resp.blob();
-    const file = new File([blob], currentName.replace(/ /g, '_') + '_geoglyph.jpg', { type: 'image/jpeg' });
+    blob = await resp.blob();
+  } catch {
+    showToast('Could not generate share image.');
+    return;
+  }
 
+  const fileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
+  const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+  try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
         files: [file],
@@ -806,28 +815,36 @@ async function shareImage() {
         text: '🌍 My name in satellite imagery via GeoGlyph',
       });
     } else if (navigator.share) {
-      // Fallback: share URL
       await navigator.share({
         title: 'GeoGlyph — My Name in Landsat',
         text: '🌍 Check out my name in NASA satellite imagery!',
         url: window.location.href,
       });
     } else {
-      // Desktop fallback: copy to clipboard
-      await navigator.clipboard.writeText(window.location.href);
-      showToast('Link copied! Share it with friends 🌍');
-    }
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      // If share fails, copy download link
+      // Desktop: download image + copy the page link
+      downloadBlob(blob, fileName);
       try {
         await navigator.clipboard.writeText(window.location.href);
-        showToast('Link copied to clipboard!');
+        showToast('📸 Image downloaded! Link copied.');
       } catch {
-        showToast('Could not share. Try downloading instead.');
+        showToast('📸 Image downloaded! Share it online.');
       }
     }
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    // Share failed (e.g. user declined), offer download instead
+    downloadBlob(blob, fileName);
+    showToast('📸 Image downloaded!');
   }
+}
+
+function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ===== Payment / HD Unlock =====
