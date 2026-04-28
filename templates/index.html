@@ -757,6 +757,17 @@ function lockIt() {
   params.set('watermarked', 'true');
   params.set('height', '1200');
 
+  // Include current filter state
+  const globalFilter = $('filterSelect').value;
+  if (globalFilter && globalFilter !== 'natural') {
+    params.set('filter', globalFilter);
+  }
+  const activeOverrides = Object.entries(currentFilters)
+    .filter(([letter, f]) => f && f !== globalFilter);
+  if (activeOverrides.length > 0) {
+    params.set('letter_filters', JSON.stringify(Object.fromEntries(activeOverrides)));
+  }
+
   // Add session token if paid
   const token = getSessionToken();
   if (token) params.set('session_token', token);
@@ -791,6 +802,18 @@ async function shareImage() {
   }
   params.set('format', 'square');
   params.set('watermarked', 'true');
+
+  // Include current filter state in share
+  const globalFilter = $('filterSelect').value;
+  if (globalFilter && globalFilter !== 'natural') {
+    params.set('filter', globalFilter);
+  }
+  // Per-letter overrides (only if different from global)
+  const activeOverrides = Object.entries(currentFilters)
+    .filter(([letter, f]) => f && f !== globalFilter);
+  if (activeOverrides.length > 0) {
+    params.set('letter_filters', JSON.stringify(Object.fromEntries(activeOverrides)));
+  }
 
   const shareUrl = '/generate?' + params.toString();
 

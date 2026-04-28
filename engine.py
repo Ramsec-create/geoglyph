@@ -1,8 +1,9 @@
 """GeoGlyph Engine — Stitch NASA Landsat letter images into a name."""
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageOps
 import os
 import json
+import numpy as np
 
 WATERMARK_FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
@@ -34,6 +35,79 @@ def image_for_char(char: str, variant: int = 0) -> Image.Image:
     if not os.path.exists(path):
         return Image.new("RGB", (500, 500), (20, 20, 20))
     return Image.open(path).convert("RGB")
+
+
+def apply_filter(img: Image.Image, filter_name: str | None) -> Image.Image:
+    """Apply CSS-matching filter effects via Pillow.
+
+    Mirrors the CSS filter classes in the frontend:
+    - natural / None: no change
+    - infrared: saturate(3) hue-rotate(-20deg) contrast(1.2)
+    - thermal: invert(0.85) sepia(0.6) saturate(1.5) contrast(1.1)
+    - contrast: contrast(1.6) saturate(1.3) brightness(1.1)
+    - grayscale: grayscale(1)
+    - falsecolor: saturate(2.5) hue-rotate(100deg)
+    """
+    if not filter_name or filter_name == "natural":
+        return img
+
+    img = img.copy()
+
+    if filter_name == "grayscale":
+        return ImageOps.grayscale(img).convert("RGB")
+
+    if filter_name == "contrast":
+        img = ImageEnhance.Contrast(img).enhance(1.6)
+        img = ImageEnhance.Color(img).enhance(1.3)
+        img = ImageEnhance.Brightness(img).enhance(1.1)
+        return img
+
+    if filter_name == "infrared":
+        img = ImageEnhance.Color(img).enhance(3.0)
+        img = _hue_rotate(img, -20)
+        img = ImageEnhance.Contrast(img).enhance(1.2)
+        return img
+
+    if filter_name == "thermal":
+        img = _invert_blend(img, 0.85)
+        img = _sepia(img, 0.6)
+        img = ImageEnhance.Color(img).enhance(1.5)
+        img = ImageEnhance.Contrast(img).enhance(1.1)
+        return img
+
+    if filter_name == "falsecolor":
+        img = ImageEnhance.Color(img).enhance(2.5)
+        img = _hue_rotate(img, 100)
+        return img
+
+    return img
+
+
+def _hue_rotate(img: Image.Image, degrees: float) -> Image.Image:
+    """Rotate the hue channel by degrees."""
+    arr = np.array(img.convert("HSV"), dtype=np.uint8)
+    h = arr[:, :, 0].astype(np.int16)
+    shift = int(degrees * 255 / 360)
+    h = (h + shift + 256) % 256
+    arr[:, :, 0] = h.astype(np.uint8)
+    return Image.fromarray(arr, "HSV").convert("RGB")
+
+
+def _invert_blend(img: Image.Image, factor: float = 1.0) -> Image.Image:
+    """Blend with inverted version (like CSS invert filter)."""
+    inverted = ImageOps.invert(img.convert("RGB"))
+    return Image.blend(img, inverted, factor)
+
+
+def _sepia(img: Image.Image, factor: float = 1.0) -> Image.Image:
+    """Apply sepia tone blended with original."""
+    gray = ImageOps.grayscale(img)
+    sepia = Image.merge("RGB", (
+        gray.point(lambda x: min(int(x * 1.2), 255)),
+        gray.point(lambda x: min(int(x * 1.08), 255)),
+        gray.point(lambda x: min(int(x * 0.76), 255)),
+    ))
+    return Image.blend(img, sepia, factor)
 
 
 def apply_watermark(img: Image.Image, text: str = "geoglyph.earth") -> Image.Image:
@@ -109,6 +183,8 @@ def generate(
     height: int = 1200,
     watermarked: bool = False,
     square: int | None = None,
+    filter_name: str | None = None,
+    letter_filters: dict[str, str] | None = None,
 ) -> Image.Image:
     """Stitch letter images for a name into a single image.
 
@@ -118,12 +194,15 @@ def generate(
         height: Target height in pixels for each letter image (default 1200).
         watermarked: If True, overlay 'geoglyph.earth' watermark.
         square: If set, pad to this size (e.g. 1080) with branding.
+        filter_name: Global filter to apply (natural, contrast, infrared, etc.).
+        letter_filters: Per-letter filter overrides {letter: filter_name}.
     """
     name = name.strip().lower()
     if not name:
         raise ValueError("Name cannot be empty")
 
     variants = variants or {}
+    letter_filters = letter_filters or {}
 
     images = []
     for c in name:
@@ -133,6 +212,10 @@ def generate(
             ratio = height / img.height
             new_w = int(img.width * ratio)
             img = img.resize((new_w, height), Image.LANCZOS)
+        # Apply per-letter filter override, else global, else none
+        lf = letter_filters.get(c, filter_name or "")
+        if lf and lf != "natural":
+            img = apply_filter(img, lf)
         images.append(img)
 
     max_h = max(img.height for img in images)

@@ -140,6 +140,8 @@ async def generate_image(
     watermarked: bool = Query(True, description="Apply watermark overlay"),
     format: str = Query("standard", regex="^(standard|square)$", description="Output format: standard=horizontal, square=1080x1080"),
     session_token: str | None = Query(None, description="Paid session token (removes watermark)"),
+    filter: str | None = Query(None, description="Global CSS filter to apply (natural, contrast, infrared, thermal, grayscale, falsecolor)"),
+    letter_filters: str | None = Query(None, description='Per-letter filter overrides JSON, e.g. {"a":"infrared","b":"thermal"}'),
 ):
     """Generate satellite name image. Free tier gets watermarked; paid tier can get clean."""
     cleaned = "".join(c for c in name if c.isalpha() or c == " ")
@@ -153,6 +155,13 @@ async def generate_image(
         except (json.JSONDecodeError, TypeError):
             return Response("Invalid variants JSON", status_code=400)
 
+    letter_filter_dict = {}
+    if letter_filters:
+        try:
+            letter_filter_dict = json.loads(letter_filters)
+        except (json.JSONDecodeError, TypeError):
+            return Response("Invalid letter_filters JSON", status_code=400)
+
     # Check if this session has paid
     is_paid = session_token and _paid_sessions.get(session_token, False)
 
@@ -162,7 +171,7 @@ async def generate_image(
     # Decide square output
     square_size = 1080 if format == "square" else None
 
-    img = generate(cleaned, variant_dict, height=height, watermarked=should_watermark, square=square_size)
+    img = generate(cleaned, variant_dict, height=height, watermarked=should_watermark, square=square_size, filter_name=filter, letter_filters=letter_filter_dict)
     buf = io.BytesIO()
     img.save(buf, "JPEG", quality=95)
     buf.seek(0)
