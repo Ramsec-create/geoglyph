@@ -139,6 +139,7 @@
     flex-direction: column;
     align-items: center;
     border-radius: 6px;
+    overflow: hidden;
     border: 2px solid transparent;
     transition: border-color 0.15s;
   }
@@ -164,8 +165,6 @@
   .letter-slot .img-wrapper {
     position: relative;
     line-height: 0;
-    overflow: hidden;
-    border-radius: 4px 4px 0 0;
   }
 
   .letter-slot img {
@@ -184,9 +183,6 @@
     width: 100%;
     background: #11111c;
     padding: 6px 10px;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #444 transparent;
   }
 
   .slot-footer .reload-btn {
@@ -200,7 +196,6 @@
     line-height: 1;
     transition: all 0.15s;
     font-weight: bold;
-    flex-shrink: 0;
   }
   .slot-footer .reload-btn:hover { color: #4fc3f7; border-color: #4fc3f7; background: #1a2a38; }
 
@@ -209,7 +204,6 @@
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
     margin-left: auto;
-    flex-shrink: 0;
   }
 
   .slot-footer .char-label {
@@ -218,7 +212,6 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 600;
-    flex-shrink: 0;
   }
 
   /* Filter classes */
@@ -240,7 +233,6 @@
     padding: 1px 7px 2px;
     line-height: 1.3;
     transition: all 0.15s;
-    flex-shrink: 0;
   }
   .slot-footer .filter-btn:hover { border-color: #4fc3f7; background: #1a2a38; }
   .slot-footer .filter-btn.overridden { border-color: #ff9800; color: #ff9800; }
@@ -394,7 +386,7 @@
     .letter-slot img { height: 200px; }
     .letter-slot .location-label { font-size: 0.6rem; padding: 2px 4px; }
     .slot-footer .reload-btn { font-size: 1rem; padding: 1px 8px 2px; }
-    .slot-footer { gap: 4px; padding: 4px 6px; overflow-x: auto; }
+    .slot-footer { gap: 4px; padding: 4px 6px; }
     .slot-footer .badge { font-size: 0.7rem; }
     .slot-footer .char-label { font-size: 0.75rem; }
     .controls-row button { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
