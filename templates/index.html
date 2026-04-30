@@ -860,12 +860,12 @@ async function shareImage() {
       await navigator.share({
         files: [file],
         title: 'GeoGlyph',
-        text: '🌍 My name in satellite imagery — geoglyph.earth',
+        text: '🌍 My name in satellite imagery — leadvector.sh',
       });
     } else if (navigator.share) {
       await navigator.share({
         title: 'GeoGlyph — My Name in Landsat',
-        text: '🌍 My name in satellite imagery via geoglyph.earth',
+        text: '🌍 My name in satellite imagery via leadvector.sh',
         url: window.location.href,
       });
     } else {

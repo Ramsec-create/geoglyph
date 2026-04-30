@@ -164,7 +164,7 @@ def overlay_location_label(img: Image.Image, title: str, coords: str) -> Image.I
     return img_rgba.convert("RGB")
 
 
-def apply_watermark(img: Image.Image, text: str = "geoglyph.earth") -> Image.Image:
+def apply_watermark(img: Image.Image, text: str = "leadvector.sh") -> Image.Image:
     """Overlay a semi-transparent watermark in the bottom-right corner."""
     try:
         font = ImageFont.truetype(WATERMARK_FONT, size=36)
@@ -247,7 +247,7 @@ def generate(
         name: The text to render.
         variants: Optional dict of letter→variant_index overrides.
         height: Target height in pixels for each letter image (default 1200).
-        watermarked: If True, overlay 'geoglyph.earth' watermark.
+        watermarked: If True, overlay 'leadvector.sh' watermark.
         square: If set, pad to this size (e.g. 1080) with branding.
         filter_name: Global filter to apply (natural, contrast, infrared, etc.).
         letter_filters: Per-letter filter overrides {letter: filter_name}.
@@ -289,7 +289,7 @@ def generate(
         x += img.width
 
     if square:
-        canvas = make_square(canvas, size=square, branding="geoglyph.earth")
+        canvas = make_square(canvas, size=square, branding="leadvector.sh")
 
     if watermarked and not square:
         canvas = apply_watermark(canvas)
