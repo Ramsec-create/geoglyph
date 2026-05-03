@@ -234,11 +234,13 @@
 
   .brand-section {
     display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
     margin-top: 1.5rem;
     text-align: center;
   }
   .brand-section a {
-    display: inline-block;
     color: #888;
     text-decoration: none;
     font-size: 0.9rem;
@@ -472,7 +474,7 @@ function renderName() {
 
   buildDisplay();
   $('controls').style.display = 'flex';
-  $('brandSection').style.display = 'block';
+  $('brandSection').style.display = 'flex';
   preloadImage();
 }
 
