@@ -175,15 +175,20 @@ def apply_watermark(img: Image.Image, text: str = "leadvector.sh — Automated L
     except (IOError, OSError):
         font = ImageFont.load_default()
 
+    # Create temp draw to measure text dimensions
+    tmp = Image.new("RGB", (1, 1))
+    tmp_draw = ImageDraw.Draw(tmp)
+    bbox = tmp_draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+
     text_gap = 18
-    line_height = 36
-    new_h = img.height + text_gap + line_height
+    bottom_pad = 4
+    new_h = img.height + text_gap + th + bottom_pad
     canvas = Image.new("RGB", (img.width, new_h), (10, 10, 15))
     canvas.paste(img, (0, 0))
 
     draw = ImageDraw.Draw(canvas)
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
     x = (img.width - tw) // 2
     y = img.height + text_gap
     draw.text((x, y), text, font=font, fill=(120, 120, 125))
@@ -258,7 +263,7 @@ def generate(
     for c in name:
         if c == ' ':
             # Space: 4px gap at full height
-            gap = Image.new("RGB", (10, height), (10, 10, 15))
+            gap = Image.new("RGB", (24, height), (10, 10, 15))
             images.append(gap)
             continue
         v = variants.get(c, 0)
