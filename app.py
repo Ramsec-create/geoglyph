@@ -140,7 +140,7 @@ async def generate_image(
     watermarked: bool = Query(True, description="Apply watermark overlay"),
     format: str = Query("standard", regex="^(standard|square)$", description="Output format: standard=horizontal, square=1080x1080"),
     session_token: str | None = Query(None, description="Paid session token (removes watermark)"),
-    filter: str | None = Query(None, description="Global CSS filter to apply (natural, contrast, infrared, thermal, grayscale, falsecolor)"),
+    filter: str = Query("infrared", description="Global CSS filter to apply (natural, contrast, infrared, thermal, grayscale, falsecolor)"),
     letter_filters: str | None = Query(None, description='Per-letter filter overrides JSON, e.g. {"a":"infrared","b":"thermal"}'),
     show_locations: bool = Query(False, description="Overlay location place names on each letter tile"),
 ):
