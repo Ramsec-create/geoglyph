@@ -267,6 +267,24 @@
     flex-wrap: wrap;
   }
 
+  .branding-band {
+    display: block;
+    margin-top: 1.25rem;
+    padding: 0.7rem 1rem;
+    background: #12121a;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .branding-band:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: #4fc3f7;
+  }
+
   .btn-share {
     background: #1565c0;
     color: #fff;
@@ -480,6 +498,9 @@
       <a id="downloadLink" download><button class="btn-download">⬇ Download</button></a>
       <button class="btn-unlock" id="unlockBtn" onclick="openPayment()">⭐ Unlock HD</button>
     </div>
+    <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="branding-band">
+      leadvector.sh — Automated Lead Pipeline  →
+    </a>
   </div>
 </div>
 
