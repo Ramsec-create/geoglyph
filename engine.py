@@ -258,7 +258,7 @@ def generate(
     for c in name:
         if c == ' ':
             # Space: 4px gap at full height
-            gap = Image.new("RGB", (4, height), (10, 10, 15))
+            gap = Image.new("RGB", (10, height), (10, 10, 15))
             images.append(gap)
             continue
         v = variants.get(c, 0)
