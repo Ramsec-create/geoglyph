@@ -591,14 +591,12 @@ function cycleVariant(slot) {
   const current = currentVariants[letter] || 0;
   currentVariants[letter] = (current + 1) > max ? 0 : current + 1;
   updateAllLetterSlots(letter);
-  _cachedImageBlob = null;
 }
 
 function reloadLetter(slot) {
   const letter = slot.dataset.letter;
   currentVariants[letter] = getRandomVariant(letter);
   updateAllLetterSlots(letter);
-  _cachedImageBlob = null;
 }
 
 function cycleLetterFilter(slot) {
@@ -615,7 +613,6 @@ function cycleLetterFilter(slot) {
     filterBtn.title = 'Filter: ' + currentFilters[letter] + ' — click to cycle';
     filterBtn.classList.add('overridden');
   }
-  _cachedImageBlob = null;
 }
 
 function updateAllLetterSlots(letter) {
@@ -653,19 +650,13 @@ function shuffleAll() {
     }
   }
   buildDisplay();
-  _cachedImageBlob = null; // invalidate stale preload
   preloadImage();
 }
 
 function applyFilter() {
   currentFilters = {}; // reset per-letter overrides
   buildDisplay();
-  _cachedImageBlob = null; // invalidate stale cache
 }
-
-  // Pre-fetched image blob cache for instant download
-  let _cachedImageBlob = null;
-  let _cachedFileName = '';
 
   function buildImageParams() {
     const choices = {};
@@ -679,8 +670,8 @@ function applyFilter() {
     if (Object.keys(choices).length > 0) {
       params.set('variants', JSON.stringify(choices));
     }
-    params.set('watermarked', 'true');
     params.set('show_locations', 'true');
+    params.set('watermarked', 'false');
 
     const globalFilter = $('filterSelect').value;
     if (globalFilter) {
@@ -697,24 +688,17 @@ function applyFilter() {
 
   // Preload image when name changes so download is instant
   function preloadImage() {
+    // Warm-up fetch — browser caches it, no client-side tracking needed
     const params = buildImageParams();
-    _cachedFileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
-    fetch('/generate?' + params.toString())
-      .then(r => r.blob())
-      .then(blob => { _cachedImageBlob = blob; })
-      .catch(() => {}); // silent — fallback to fetch-on-click
+    fetch('/generate?' + params.toString()).catch(() => {});
+  }
   }
 
   function downloadImage() {
-    const fileName = _cachedFileName || (currentName.replace(/ /g, '_') + '_geoglyph.jpg');
-
-    if (_cachedImageBlob) {
-      downloadBlob(_cachedImageBlob, fileName);
-      return;
-    }
-
-    // Fallback: fetch and download
+    // Always fetch branded version — don't use cached display blob
+    const fileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
     const params = buildImageParams();
+    params.set('watermarked', 'true');
     fetch('/generate?' + params.toString())
       .then(r => r.blob())
       .then(blob => downloadBlob(blob, fileName))
@@ -756,19 +740,11 @@ async function shareImage() {
   const shareUrl = '/generate?' + params.toString();
   const fileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
 
-  // Reuse the preloaded blob when available (same params as download preload)
-  if (_cachedImageBlob && _cachedFileName === fileName) {
-    shareBlob(_cachedImageBlob, fileName);
-    return;
-  }
-
-  // Fetch fresh
+  // Fetch fresh branded version
   let blob;
   try {
     const resp = await fetch(shareUrl);
     blob = await resp.blob();
-    _cachedImageBlob = blob;
-    _cachedFileName = fileName;
   } catch {
     showToast('Could not generate share image.');
     return;
