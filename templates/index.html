@@ -436,11 +436,11 @@ function $(id) { return document.getElementById(id); }
 Promise.all([
   fetch('/variants').then(r => r.json()).then(d => { VARIANT_MAP = d; })
 ]).then(() => {
-  $('nameInput').value = 'Sriram';
+  $('nameInput').value = 'lead vector';
   renderName();
 }).catch(() => {
   // Fallback: render with empty VARIANT_MAP (all 1/1 badges)
-  $('nameInput').value = 'Sriram';
+  $('nameInput').value = 'lead vector';
   renderName();
 });
 
@@ -691,7 +691,6 @@ function applyFilter() {
     // Warm-up fetch — browser caches it
     const params = buildImageParams();
     fetch('/generate?' + params.toString()).catch(() => {});
-  }
   }
 
   function downloadImage() {
