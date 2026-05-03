@@ -232,8 +232,20 @@
   }
   .letter-slot img.cycling { animation: cycleIn 0.2s ease-out; }
 
+  .image-wrapper {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .composite-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+  }
+
   .brand-section {
-    display: none;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
@@ -395,11 +407,16 @@
     <div class="empty-state">Enter a name above and hit Go ✨</div>
   </div>
 
-  <div class="brand-section" id="brandSection" style="display:none;">
-    <button class="btn-download" onclick="downloadImage()">⬇ Download Your Name</button>
-    <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="brand-heading">
-      leadvector.sh — Automated Lead Pipeline →
-    </a>
+  <div id="imageContainer" style="display:none;">
+    <div class="image-wrapper">
+      <img id="compositeImg" alt="" class="composite-image">
+    </div>
+    <div class="brand-section">
+      <button class="btn-download" onclick="downloadImage()">⬇ Download Your Name</button>
+      <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="brand-heading">
+        leadvector.sh — Automated Lead Pipeline →
+      </a>
+    </div>
   </div>
 </div>
 
@@ -455,12 +472,12 @@ function getRandomVariant(letter) {
 
 function renderName() {
   const raw = $('nameInput').value.trim();
-  if (!raw) { $('brandSection').style.display = 'none'; return; }
+  if (!raw) { $('imageContainer').style.display = 'none'; return; }
 
   const name = raw.toLowerCase().replace(/[^a-z ]/g, '');
   if (!name) { 
     $('letterDisplay').innerHTML = '<div class="empty-state">Only letters allowed 🌍</div>';
-    $('brandSection').style.display = 'none';
+    $('imageContainer').style.display = 'none';
     return;
   }
 
@@ -474,8 +491,8 @@ function renderName() {
 
   buildDisplay();
   $('controls').style.display = 'flex';
-  $('brandSection').style.display = 'flex';
-  preloadImage();
+  $('imageContainer').style.display = 'block';
+  $('compositeImg').src = '/generate?' + buildImageParams().toString();
 }
 
 function buildDisplay() {
@@ -650,7 +667,7 @@ function shuffleAll() {
     }
   }
   buildDisplay();
-  preloadImage();
+  $('compositeImg').src = '/generate?' + buildImageParams().toString();
 }
 
 function applyFilter() {
@@ -688,9 +705,7 @@ function applyFilter() {
 
   // Preload image when name changes so download is instant
   function preloadImage() {
-    // Warm-up fetch — browser caches it, no client-side tracking needed
-    const params = buildImageParams();
-    fetch('/generate?' + params.toString()).catch(() => {});
+    // Warm-up — handled by compositeImg src in renderName
   }
   }
 
