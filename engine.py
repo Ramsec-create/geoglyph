@@ -165,34 +165,37 @@ def overlay_location_label(img: Image.Image, title: str, coords: str) -> Image.I
 
 
 def apply_watermark(img: Image.Image, text: str = "leadvector.sh — Automated Lead Pipeline") -> Image.Image:
-    """Overlay a semi-transparent branding band at the bottom of the image.
+    """Add a branding band below the image (extends canvas height).
 
-    The band is positioned at the bottom edge, spanning the full image width,
-    making it hard to crop out without losing tile content.
+    The band sits below the image content with a 4px gap so tile imagery
+    stays untouched. The band itself is dark, matching the letter gap bg.
     """
     try:
         font = ImageFont.truetype(WATERMARK_FONT, size=30)
     except (IOError, OSError):
         font = ImageFont.load_default()
 
-    band_height = 56
-    wm = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(wm)
+    band_height = 60
+    gap = 4
+    new_h = img.height + gap + band_height
+    canvas = Image.new("RGB", (img.width, new_h), (10, 10, 15))
+    canvas.paste(img, (0, 0))
 
-    # Full-width dark bar at bottom
+    draw = ImageDraw.Draw(canvas)
+    band_y = img.height + gap
     draw.rectangle(
-        [0, img.height - band_height, img.width, img.height],
-        fill=(0, 0, 0, 160),
+        [0, band_y, img.width, new_h],
+        fill=(15, 15, 20),
     )
 
     # Centered text
     bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     x = (img.width - tw) // 2
-    y = img.height - band_height + (band_height - (bbox[3] - bbox[1])) // 2 - 2
-    draw.text((x, y), text, font=font, fill=(200, 200, 200, 220))
+    y = band_y + (band_height - (bbox[3] - bbox[1])) // 2 - 2
+    draw.text((x, y), text, font=font, fill=(140, 140, 145))
 
-    return Image.alpha_composite(img.convert("RGBA"), wm).convert("RGB")
+    return canvas
 
 
 def make_square(img: Image.Image, size: int = 1080, bg_color=(10, 10, 15), branding: str = "") -> Image.Image:
