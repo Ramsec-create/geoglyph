@@ -164,7 +164,7 @@ def overlay_location_label(img: Image.Image, title: str, coords: str) -> Image.I
     return img_rgba.convert("RGB")
 
 
-def apply_watermark(img: Image.Image, text: str = "leadvector.sh") -> Image.Image:
+def apply_watermark(img: Image.Image, text: str = "leadvector.sh — Automated Lead Pipeline") -> Image.Image:
     """Overlay a semi-transparent watermark in the bottom-right corner."""
     try:
         font = ImageFont.truetype(WATERMARK_FONT, size=36)
@@ -289,7 +289,7 @@ def generate(
         x += img.width
 
     if square:
-        canvas = make_square(canvas, size=square, branding="leadvector.sh")
+        canvas = make_square(canvas, size=square, branding="leadvector.sh — Automated Lead Pipeline")
 
     if watermarked and not square:
         canvas = apply_watermark(canvas)
