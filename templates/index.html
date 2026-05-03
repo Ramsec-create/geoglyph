@@ -249,6 +249,24 @@
   .brand-section a:hover {
     color: #4fc3f7;
   }
+  .brand-section .btn-download {
+    background: #2e7d32;
+    color: #fff;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 0.5rem;
+  }
+  .brand-section .btn-download:hover {
+    background: #388e3c;
+  }
+  .brand-section .btn-download:active {
+    background: #1b5e20;
+  }
 
   .btn-share {
     background: #1565c0;
@@ -376,6 +394,7 @@
   </div>
 
   <div class="brand-section" id="brandSection" style="display:none;">
+    <button class="btn-download" onclick="downloadImage()">⬇ Download Your Name</button>
     <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="brand-heading">
       leadvector.sh — Automated Lead Pipeline →
     </a>
@@ -633,6 +652,43 @@ function shuffleAll() {
 function applyFilter() {
   currentFilters = {}; // reset per-letter overrides
   buildDisplay();
+}
+
+function downloadImage() {
+  const choices = {};
+  for (const c of currentName) {
+    if (c !== ' ' && (c in currentVariants)) {
+      choices[c] = currentVariants[c];
+    }
+  }
+
+  const params = new URLSearchParams({ name: currentName });
+  if (Object.keys(choices).length > 0) {
+    params.set('variants', JSON.stringify(choices));
+  }
+  params.set('watermarked', 'true');
+  params.set('height', '1200');
+  params.set('show_locations', 'true');
+
+  // Include current filter state
+  const globalFilter = $('filterSelect').value;
+  if (globalFilter) {
+    params.set('filter', globalFilter);
+  }
+  const activeOverrides = Object.entries(currentFilters)
+    .filter(([letter, f]) => f && f !== globalFilter);
+  if (activeOverrides.length > 0) {
+    params.set('letter_filters', JSON.stringify(Object.fromEntries(activeOverrides)));
+  }
+
+  const resultUrl = '/generate?' + params.toString();
+
+  // Fetch and download
+  const fileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
+  fetch(resultUrl)
+    .then(r => r.blob())
+    .then(blob => downloadBlob(blob, fileName))
+    .catch(() => showToast('Failed to generate image. Try again.'));
 }
 
 // ===== Share =====
