@@ -109,18 +109,6 @@
   }
   .btn-shuffle:hover { background: #3a3a4e; }
 
-  .btn-lock {
-    background: #0288d1;
-    color: #fff;
-  }
-  .btn-lock:hover { background: #039be5; }
-  .btn-lock:disabled { background: #1a3a4a; color: #666; cursor: not-allowed; }
-
-  .btn-download {
-    background: #2e7d32;
-    color: #fff;
-  }
-  .btn-download:hover { background: #388e3c; }
 
   /* Letter display area */
   .name-display {
@@ -260,29 +248,13 @@
     margin-bottom: 1rem;
   }
 
-  .result .result-actions {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .branding-band {
-    display: block;
-    margin-top: 1.25rem;
-    padding: 0.7rem 1rem;
-    background: #12121a;
-    border: 1px solid #2a2a35;
-    border-radius: 8px;
-    color: rgba(255,255,255,0.55);
-    font-size: 0.8rem;
-    text-decoration: none;
-    transition: color 0.2s, border-color 0.2s;
-    letter-spacing: 0.02em;
-  }
-  .branding-band:hover {
-    color: rgba(255,255,255,0.85);
-    border-color: #4fc3f7;
+  .brand-heading {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #888;
+    text-align: center;
+    letter-spacing: 0.04em;
   }
 
   .btn-share {
@@ -297,80 +269,6 @@
     transition: background 0.2s;
   }
   .btn-share:hover { background: #1976d2; }
-
-  .btn-unlock {
-    background: #e65100;
-    color: #fff;
-    padding: 0.5rem 1.25rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-unlock:hover { background: #ef6c00; }
-  .btn-unlock.unlocked { background: #2e7d32; }
-  .btn-unlock.unlocked:hover { background: #388e3c; }
-
-  /* Payment modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.visible { display: flex; }
-  .modal-box {
-    background: #1a1a24;
-    border-radius: 16px;
-    padding: 2rem;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    border: 1px solid #333;
-  }
-  .modal-box h2 { margin-bottom: 1rem; color: #fff; }
-  .modal-box p { color: #aaa; margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.9rem; }
-  .modal-box .price { font-size: 2rem; font-weight: 700; color: #fff; margin: 1rem 0; }
-  .modal-box .btn-pay {
-    background: #e65100;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.2s;
-  }
-  .modal-box .btn-pay:hover { background: #ef6c00; }
-  .modal-box .btn-pay:disabled { background: #444; cursor: not-allowed; }
-  .modal-box .btn-close {
-    background: none;
-    border: none;
-    color: #666;
-    margin-top: 1rem;
-    cursor: pointer;
-    font-size: 0.85rem;
-  }
-  .modal-box .btn-close:hover { color: #aaa; }
-  .modal-box .features {
-    text-align: left;
-    margin: 1rem 0;
-    list-style: none;
-    padding: 0;
-  }
-  .modal-box .features li {
-    padding: 0.4rem 0;
-    color: #ccc;
-    font-size: 0.85rem;
-  }
-  .modal-box .features li:before { content: '✔ '; color: #4caf50; }
 
   .empty-state {
     text-align: center;
@@ -412,8 +310,7 @@
     .name-display { padding-bottom: 4px; gap: 4px; justify-content: flex-start; }
     .input-row input { font-size: 1rem; padding: 0.6rem 0.8rem; }
     .input-row button { font-size: 0.9rem; padding: 0.6rem 1rem; }
-    .result-actions button,
-    .result-actions a button { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+
   }
   @media (max-width: 480px) {
     .letter-slot { width: 54px; flex-shrink: 0; }
@@ -423,8 +320,7 @@
     .subtitle { font-size: 0.75rem; margin-bottom: 1rem; }
     .input-row { gap: 0.4rem; margin-bottom: 1rem; }
     .controls-row { gap: 0.5rem; margin-bottom: 1rem; }
-    .modal-box { padding: 1.5rem; }
-    .modal-box .price { font-size: 1.6rem; }
+
     /* Mobile: bare symbol footer — tighter to fit 54px */
     .slot-footer { gap: 0; padding: 4px; justify-content: center; }
     .slot-footer .char-label { display: none; }
@@ -478,9 +374,8 @@
       <option value="grayscale">⚪ Grayscale</option>
       <option value="falsecolor">🎨 False Color</option>
     </select>
-    <button class="btn-shuffle" onclick="shuffleAll()">🎲 Shuffle All</button>
-    <button class="btn-lock" id="lockBtn" onclick="lockIt()">🔒 Generate Image</button>
-    <button class="btn-share" id="shareBtn" onclick="shareCurrentName()" style="display:none;">📤 Share</button>
+    <button class="btn-shuffle" onclick="shuffleAll(); lockIt()">🎲 Shuffle</button>
+    <button class="btn-share" id="shareBtn" onclick="shareCurrentName()">📤 Share</button>
   </div>
 
   <div id="letterDisplay" class="name-display">
@@ -489,35 +384,7 @@
 
   <div class="result" id="result">
     <img id="resultImage" alt="Generated name">
-    <div id="resultWatermarkBadge" style="font-size:0.75rem;color:#888;margin-bottom:0.75rem;">
-      <span id="watermarkLabel">🆓 Free — contains watermark</span>
-    </div>
-    <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="branding-band">
-      leadvector.sh — Automated Lead Pipeline  →
-    </a>
-    <div class="result-actions">
-      <button class="btn-share" onclick="shareImage()">📤 Share</button>
-      <button class="btn-shuffle" onclick="shuffleAll(); document.getElementById('result').classList.remove('visible')">🎲 Shuffle Again</button>
-      <a id="downloadLink" download><button class="btn-download">⬇ Download</button></a>
-      <button class="btn-unlock" id="unlockBtn" onclick="openPayment()">⭐ Unlock HD</button>
-    </div>
-  </div>
-</div>
-
-<!-- Payment Modal -->
-<div class="modal-overlay" id="paymentModal">
-  <div class="modal-box">
-    <h2>🌟 GeoGlyph HD</h2>
-    <div class="price">$4 <span style="font-size:0.9rem;color:#888;">one-time</span></div>
-    <ul class="features">
-      <li>High-resolution download (up to 4000px)</li>
-      <li>No watermark — clean for printing</li>
-      <li>Print-ready quality (300 DPI)</li>
-      <li>Support the project 🌍</li>
-    </ul>
-    <button class="btn-pay" id="payBtn" onclick="startCheckout()">💳 Pay $4 — Unlock Now</button>
-    <p style="font-size:0.75rem;color:#666;margin-top:0.75rem;">Secure payment via Dodo Payments · UPI, cards &amp; more</p>
-    <button class="btn-close" onclick="closePayment()">Maybe later</button>
+    <h2 class="brand-heading">leadvector.sh — Automated Lead Pipeline</h2>
   </div>
 </div>
 
@@ -588,10 +455,8 @@ function renderName() {
 
   buildDisplay();
   $('controls').style.display = 'flex';
-  $('shareBtn').style.display = 'inline-block';
   $('result').classList.remove('visible');
-  $('lockBtn').disabled = false;
-  $('lockBtn').textContent = '🔒 Generate Image';
+  lockIt();
 }
 
 function buildDisplay() {
@@ -708,8 +573,7 @@ function cycleVariant(slot) {
   currentVariants[letter] = (current + 1) > max ? 0 : current + 1;
   updateAllLetterSlots(letter);
   $('result').classList.remove('visible');
-  $('lockBtn').disabled = false;
-  $('lockBtn').textContent = '🔒 Generate Image';
+  lockIt();
 }
 
 function reloadLetter(slot) {
@@ -717,8 +581,7 @@ function reloadLetter(slot) {
   currentVariants[letter] = getRandomVariant(letter);
   updateAllLetterSlots(letter);
   $('result').classList.remove('visible');
-  $('lockBtn').disabled = false;
-  $('lockBtn').textContent = '🔒 Generate Image';
+  lockIt();
 }
 
 function cycleLetterFilter(slot) {
@@ -773,8 +636,7 @@ function shuffleAll() {
   }
   buildDisplay();
   $('result').classList.remove('visible');
-  $('lockBtn').disabled = false;
-  $('lockBtn').textContent = '🔒 Generate Image';
+  lockIt();
 }
 
 function applyFilter() {
@@ -783,10 +645,6 @@ function applyFilter() {
 }
 
 function lockIt() {
-  const btn = $('lockBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-
   const choices = {};
   for (const c of currentName) {
     if (c !== ' ' && (c in currentVariants)) {
@@ -813,19 +671,9 @@ function lockIt() {
     params.set('letter_filters', JSON.stringify(Object.fromEntries(activeOverrides)));
   }
 
-  // Add session token if paid
-  const token = getSessionToken();
-  if (token) params.set('session_token', token);
-
   const resultUrl = '/generate?' + params.toString();
   $('resultImage').src = resultUrl;
-  $('downloadLink').href = resultUrl;
-  $('downloadLink').download = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
-
   $('result').classList.add('visible');
-  btn.textContent = token ? '✅ Locked (HD)' : '✅ Locked';
-
-  updateUnlockUI();
 }
 
 // ===== Share =====
@@ -916,131 +764,12 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(url);
 }
 
-// ===== Payment / HD Unlock =====
-function getSessionToken() {
-  return sessionStorage.getItem('geoglyph_session_token');
-}
-
-function isPaid() {
-  return !!getSessionToken();
-}
-
-function openPayment() {
-  if (isPaid()) {
-    // Already paid — regenerate without watermark
-    regenerateClean();
-    return;
-  }
-  $('paymentModal').classList.add('visible');
-}
-
-function closePayment() {
-  $('paymentModal').classList.remove('visible');
-}
-
-async function startCheckout() {
-  const payBtn = $('payBtn');
-  payBtn.disabled = true;
-  payBtn.textContent = '⏳ Opening checkout...';
-
-  const choices = {};
-  for (const c of currentName) {
-    if (c !== ' ' && (c in currentVariants)) {
-      choices[c] = currentVariants[c];
-    }
-  }
-
-  try {
-    const resp = await fetch('/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: currentName,
-        variants: Object.keys(choices).length > 0 ? JSON.stringify(choices) : null,
-      }),
-    });
-    const data = await resp.json();
-
-    if (data.session_token) {
-      sessionStorage.setItem('geoglyph_session_token', data.session_token);
-    }
-
-    // Open checkout in new tab
-    window.open(data.url, '_blank');
-
-    closePayment();
-    showToast('Checkout opened in new tab. Complete payment to unlock HD!');
-  } catch (err) {
-    showToast('Payment unavailable right now. Try again later.');
-    console.error('Checkout error:', err);
-  } finally {
-    payBtn.disabled = false;
-    payBtn.textContent = '💳 Pay $4 — Unlock Now';
-  }
-}
-
-function regenerateClean() {
-  const choices = {};
-  for (const c of currentName) {
-    if (c !== ' ' && (c in currentVariants)) {
-      choices[c] = currentVariants[c];
-    }
-  }
-
-  const params = new URLSearchParams({ name: currentName });
-  if (Object.keys(choices).length > 0) {
-    params.set('variants', JSON.stringify(choices));
-  }
-  params.set('watermarked', 'false');
-  params.set('height', '1200');
-  params.set('show_locations', 'true');
-  params.set('session_token', getSessionToken());
-
-  const cleanUrl = '/generate?' + params.toString();
-  $('resultImage').src = cleanUrl;
-  $('downloadLink').href = cleanUrl;
-  updateUnlockUI();
-}
-
-function updateUnlockUI() {
-  const unlockBtn = $('unlockBtn');
-  const wmLabel = $('watermarkLabel');
-  if (isPaid()) {
-    unlockBtn.textContent = '✅ HD Unlocked';
-    unlockBtn.className = 'btn-unlock unlocked';
-    if (wmLabel) wmLabel.textContent = '⭐ HD — no watermark';
-  } else {
-    unlockBtn.textContent = '⭐ Unlock HD';
-    unlockBtn.className = 'btn-unlock';
-    if (wmLabel) wmLabel.textContent = '🆓 Free — contains watermark';
-  }
-}
-
 // ===== Toast =====
 function showToast(msg) {
   const el = $('toast');
   el.textContent = msg;
   el.classList.add('visible');
   setTimeout(() => el.classList.remove('visible'), 3000);
-}
-
-// ===== Listen for payment success postMessage =====
-window.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'geoglyph-paid') {
-    sessionStorage.setItem('geoglyph_session_token', event.data.sessionToken);
-    showToast('Payment confirmed! HD unlocked 🎉');
-    // If result is visible, regenerate clean
-    if ($('result').classList.contains('visible')) {
-      regenerateClean();
-    } else {
-      updateUnlockUI();
-    }
-  }
-});
-
-// ===== Restore token on page load =====
-if (getSessionToken()) {
-  updateUnlockUI();
 }
 
 $('nameInput').addEventListener('keydown', e => {
