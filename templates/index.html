@@ -679,7 +679,6 @@ function applyFilter() {
     if (Object.keys(choices).length > 0) {
       params.set('variants', JSON.stringify(choices));
     }
-    params.set('format', 'square');
     params.set('watermarked', 'true');
     params.set('show_locations', 'true');
 
@@ -739,7 +738,6 @@ async function shareImage() {
   if (Object.keys(choices).length > 0) {
     params.set('variants', JSON.stringify(choices));
   }
-  params.set('format', 'square');
   params.set('watermarked', 'true');
   params.set('show_locations', 'true');
 

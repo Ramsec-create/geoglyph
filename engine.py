@@ -165,34 +165,32 @@ def overlay_location_label(img: Image.Image, title: str, coords: str) -> Image.I
 
 
 def apply_watermark(img: Image.Image, text: str = "leadvector.sh — Automated Lead Pipeline") -> Image.Image:
-    """Overlay a semi-transparent watermark in the bottom-right corner."""
+    """Overlay a semi-transparent branding band at the bottom of the image.
+
+    The band is positioned at the bottom edge, spanning the full image width,
+    making it hard to crop out without losing tile content.
+    """
     try:
-        font = ImageFont.truetype(WATERMARK_FONT, size=36)
+        font = ImageFont.truetype(WATERMARK_FONT, size=30)
     except (IOError, OSError):
         font = ImageFont.load_default()
 
+    band_height = 56
     wm = Image.new("RGBA", img.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(wm)
 
-    # Measure text width
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
-
-    padding = 20
-    x = img.width - tw - padding - 16
-    y = img.height - th - padding - 12
-
-    # Dark pill background
-    bg_w = tw + padding * 2 + 8
-    bg_h = th + padding
-    draw.rounded_rectangle(
-        [x - 8, y - 6, x + bg_w, y + bg_h],
-        radius=8,
-        fill=(0, 0, 0, 140),
+    # Full-width dark bar at bottom
+    draw.rectangle(
+        [0, img.height - band_height, img.width, img.height],
+        fill=(0, 0, 0, 160),
     )
 
-    draw.text((x, y - 2), text, font=font, fill=(255, 255, 255, 200))
+    # Centered text
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    x = (img.width - tw) // 2
+    y = img.height - band_height + (band_height - (bbox[3] - bbox[1])) // 2 - 2
+    draw.text((x, y), text, font=font, fill=(200, 200, 200, 220))
 
     return Image.alpha_composite(img.convert("RGBA"), wm).convert("RGB")
 
