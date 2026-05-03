@@ -175,25 +175,18 @@ def apply_watermark(img: Image.Image, text: str = "leadvector.sh — Automated L
     except (IOError, OSError):
         font = ImageFont.load_default()
 
-    band_height = 60
-    gap = 4
-    new_h = img.height + gap + band_height
+    text_gap = 18
+    line_height = 36
+    new_h = img.height + text_gap + line_height
     canvas = Image.new("RGB", (img.width, new_h), (10, 10, 15))
     canvas.paste(img, (0, 0))
 
     draw = ImageDraw.Draw(canvas)
-    band_y = img.height + gap
-    draw.rectangle(
-        [0, band_y, img.width, new_h],
-        fill=(15, 15, 20),
-    )
-
-    # Centered text
     bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     x = (img.width - tw) // 2
-    y = band_y + (band_height - (bbox[3] - bbox[1])) // 2 - 2
-    draw.text((x, y), text, font=font, fill=(140, 140, 145))
+    y = img.height + text_gap
+    draw.text((x, y), text, font=font, fill=(120, 120, 125))
 
     return canvas
 
