@@ -454,7 +454,7 @@
   <div class="controls-row" id="controls" style="display:none;">
     <select class="filter-select" id="filterSelect" onchange="applyFilter()">
       <option value="natural">🌿 Natural</option>
-      <option value="infrared">🔥 Infrared</option>
+      <option value="infrared" selected>🔥 Infrared</option>
       <option value="thermal">🌡️ Thermal</option>
       <option value="contrast">✨ High Contrast</option>
       <option value="grayscale">⚪ Grayscale</option>
@@ -783,7 +783,7 @@ function lockIt() {
 
   // Include current filter state
   const globalFilter = $('filterSelect').value;
-  if (globalFilter && globalFilter !== 'natural') {
+  if (globalFilter) {
     params.set('filter', globalFilter);
   }
   const activeOverrides = Object.entries(currentFilters)
@@ -830,7 +830,7 @@ async function shareImage() {
 
   // Include current filter state in share
   const globalFilter = $('filterSelect').value;
-  if (globalFilter && globalFilter !== 'natural') {
+  if (globalFilter) {
     params.set('filter', globalFilter);
   }
   // Per-letter overrides (only if different from global)
