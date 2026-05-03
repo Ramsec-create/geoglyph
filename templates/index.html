@@ -486,8 +486,7 @@ function buildDisplay() {
   for (const c of currentName) {
     if (c === ' ') {
       const spacer = document.createElement('div');
-      spacer.style.cssText = 'width:10px;display:flex;align-items:center;justify-content:center;color:#555;font-size:1rem;';
-      spacer.textContent = '|';
+      spacer.style.cssText = 'width:4px;flex-shrink:0;';
       display.appendChild(spacer);
       continue;
     }

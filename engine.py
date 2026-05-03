@@ -256,6 +256,11 @@ def generate(
 
     images = []
     for c in name:
+        if c == ' ':
+            # Space: 4px gap at full height
+            gap = Image.new("RGB", (4, height), (10, 10, 15))
+            images.append(gap)
+            continue
         v = variants.get(c, 0)
         img = image_for_char(c, v)
         if img.height != height:
