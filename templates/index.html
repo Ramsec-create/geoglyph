@@ -232,37 +232,22 @@
   }
   .letter-slot img.cycling { animation: cycleIn 0.2s ease-out; }
 
-  /* Download area */
-  .download-area {
+  .brand-section {
     display: none;
     margin-top: 1.5rem;
     text-align: center;
   }
-  .download-area .btn-download {
-    background: #2e7d32;
-    color: #fff;
-    padding: 0.75rem 2rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .download-area .btn-download:hover {
-    background: #388e3c;
-  }
-  .download-area .btn-download:active {
-    background: #1b5e20;
-  }
-
-  .brand-heading {
-    margin-top: 1rem;
+  .brand-section a {
+    display: inline-block;
+    color: #888;
+    text-decoration: none;
     font-size: 0.9rem;
     font-weight: 400;
-    color: #888;
-    text-align: center;
     letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .brand-section a:hover {
+    color: #4fc3f7;
   }
 
   .btn-share {
@@ -390,9 +375,10 @@
     <div class="empty-state">Enter a name above and hit Go ✨</div>
   </div>
 
-  <div class="download-area" id="downloadArea" style="display:none;">
-    <button class="btn-download" onclick="downloadImage()">⬇ Download Your Name</button>
-    <h2 class="brand-heading">leadvector.sh — Automated Lead Pipeline</h2>
+  <div class="brand-section" id="brandSection" style="display:none;">
+    <a href="https://leadvector.sh" target="_blank" rel="noopener noreferrer" class="brand-heading">
+      leadvector.sh — Automated Lead Pipeline →
+    </a>
   </div>
 </div>
 
@@ -448,10 +434,14 @@ function getRandomVariant(letter) {
 
 function renderName() {
   const raw = $('nameInput').value.trim();
-  if (!raw) return;
+  if (!raw) { $('brandSection').style.display = 'none'; return; }
 
   const name = raw.toLowerCase().replace(/[^a-z ]/g, '');
-  if (!name) { $('letterDisplay').innerHTML = '<div class="empty-state">Only letters allowed 🌍</div>'; return; }
+  if (!name) { 
+    $('letterDisplay').innerHTML = '<div class="empty-state">Only letters allowed 🌍</div>';
+    $('brandSection').style.display = 'none';
+    return;
+  }
 
   currentName = name;
 
@@ -463,7 +453,7 @@ function renderName() {
 
   buildDisplay();
   $('controls').style.display = 'flex';
-  $('downloadArea').style.display = 'block';
+  $('brandSection').style.display = 'block';
 }
 
 function buildDisplay() {
@@ -643,43 +633,6 @@ function shuffleAll() {
 function applyFilter() {
   currentFilters = {}; // reset per-letter overrides
   buildDisplay();
-}
-
-function downloadImage() {
-  const choices = {};
-  for (const c of currentName) {
-    if (c !== ' ' && (c in currentVariants)) {
-      choices[c] = currentVariants[c];
-    }
-  }
-
-  const params = new URLSearchParams({ name: currentName });
-  if (Object.keys(choices).length > 0) {
-    params.set('variants', JSON.stringify(choices));
-  }
-  params.set('watermarked', 'true');
-  params.set('height', '1200');
-  params.set('show_locations', 'true');
-
-  // Include current filter state
-  const globalFilter = $('filterSelect').value;
-  if (globalFilter) {
-    params.set('filter', globalFilter);
-  }
-  const activeOverrides = Object.entries(currentFilters)
-    .filter(([letter, f]) => f && f !== globalFilter);
-  if (activeOverrides.length > 0) {
-    params.set('letter_filters', JSON.stringify(Object.fromEntries(activeOverrides)));
-  }
-
-  const resultUrl = '/generate?' + params.toString();
-
-  // Fetch and download without rendering
-  const fileName = currentName.replace(/ /g, '_') + '_geoglyph.jpg';
-  fetch(resultUrl)
-    .then(r => r.blob())
-    .then(blob => downloadBlob(blob, fileName))
-    .catch(() => showToast('Failed to generate image. Try again.'));
 }
 
 // ===== Share =====
